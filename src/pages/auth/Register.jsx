@@ -58,12 +58,12 @@ export default function Register() {
             Cookies.set('staff_token', token, { path: '/staff', sameSite: 'Strict', expires: 7 });
             Cookies.set('staff_role', roleName, { path: '/staff', sameSite: 'Strict', expires: 7 });
             Cookies.set('staff_userId', user.id, { path: '/staff', sameSite: 'Strict', expires: 7 });
-            window.location.href = 'https://project4-fe-user.vercel.app/staff';
+            window.location.href = 'https://project4-fe-user.vercel.app';
           } else if (roleName === 'ROLE_MANAGER' || roleName === 'ROLE_MANAGE') {
             Cookies.set('manager_token', token, { path: '/manager', sameSite: 'Strict', expires: 7 });
             Cookies.set('manager_role', roleName, { path: '/manager', sameSite: 'Strict', expires: 7 });
             Cookies.set('manager_userId', user.id, { path: '/manager', sameSite: 'Strict', expires: 7 });
-            window.location.href = 'https://project4-fe-user.vercel.app/staff';
+            window.location.href = 'https://project4-fe-user.vercel.app';
           } else {
             Cookies.remove('admin_token', { path: '/admin' });
             Cookies.remove('admin_role', { path: '/admin' });
