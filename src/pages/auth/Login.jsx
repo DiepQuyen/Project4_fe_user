@@ -41,7 +41,7 @@ export default function Login() {
     e.preventDefault();
     setError('');
     try {
-      const res = await fetch('http://localhost:8080/api/v1/userDetail/login', {
+      const res = await fetch('https://sparlex.up.railway.app/api/v1/userDetail/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

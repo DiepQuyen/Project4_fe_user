@@ -26,10 +26,10 @@ import { toast } from 'react-toastify';
 import Cookies from 'js-cookie';
 import { useAppointmentFilter } from 'contexts/AppointmentFilterContext';
 
-const API_URL = 'http://localhost:8080/api/v1/admin/appointment';
-const API_STAFF_URL = 'http://localhost:8080/api/v1/admin/accounts/find-all';
-const API_SERVICE_URL = 'http://localhost:8080/api/v1/services/findAll';
-const EMAIL_API_URL = 'http://localhost:8080/api/v1/email/send-appointment-confirmation';
+const API_URL = 'https://sparlex.up.railway.app/api/v1/admin/appointment';
+const API_STAFF_URL = 'https://sparlex.up.railway.app/api/v1/admin/accounts/find-all';
+const API_SERVICE_URL = 'https://sparlex.up.railway.app/api/v1/services/findAll';
+const EMAIL_API_URL = 'https://sparlex.up.railway.app/api/v1/email/send-appointment-confirmation';
 
 const AppointmentManagement = () => {
   // States

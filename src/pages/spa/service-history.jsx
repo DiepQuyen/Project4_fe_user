@@ -15,7 +15,7 @@ import MainCard from 'components/MainCard';
 import { toast } from 'react-toastify';
 import { ToastContainer } from 'react-toastify';
 
-const API_URL = 'http://localhost:8080/api/v1/serviceHistory';
+const API_URL = 'https://sparlex.up.railway.app/api/v1/serviceHistory';
 
 const ServiceHistory = () => {
   // States

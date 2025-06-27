@@ -35,7 +35,7 @@ import SearchOutlined from '@ant-design/icons/SearchOutlined';
 
 // API client configuration
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8080/api/v1',
+  baseURL: 'https://sparlex.up.railway.app/api/v1',
   headers: {
     'Content-Type': 'application/json'
   }

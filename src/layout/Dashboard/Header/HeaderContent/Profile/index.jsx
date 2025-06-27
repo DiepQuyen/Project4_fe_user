@@ -76,7 +76,7 @@ export default function Profile() {
 
   const fetchUserData = async (token, role) => {
     try {
-      const res = await fetch('http://localhost:8080/api/v1/userDetail/me', {
+      const res = await fetch('https://sparlex.up.railway.app/api/v1/userDetail/me', {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -123,7 +123,7 @@ export default function Profile() {
 
 const handleLogout = async () => {
   try {
-    await fetch('http://localhost:8080/api/v1/userDetail/logout', { method: 'POST', credentials: 'include' });
+    await fetch('https://sparlex.up.railway.app/api/v1/userDetail/logout', { method: 'POST', credentials: 'include' });
   } catch (e) {
     console.error('Logout failed:', e);
   }

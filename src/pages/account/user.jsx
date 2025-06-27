@@ -44,7 +44,7 @@ import {
 // project imports
 import MainCard from 'components/MainCard';
 
-const API_URL = 'http://localhost:8080/api/v1/customer';
+const API_URL = 'https://sparlex.up.railway.app/api/v1/customer';
 
 // ==============================|| USER ACCOUNT PAGE ||============================== //
 

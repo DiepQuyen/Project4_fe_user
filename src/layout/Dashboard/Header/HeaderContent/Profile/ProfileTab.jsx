@@ -21,7 +21,7 @@ export default function ProfileTab() {
 
   const handleLogout = async () => {
     try {
-      await fetch('http://localhost:8080/api/v1/userDetail/logout', { method: 'POST', credentials: 'include' });
+      await fetch('https://sparlex.up.railway.app/api/v1/userDetail/logout', { method: 'POST', credentials: 'include' });
     } catch (e) { }
    
     Cookies.remove('admin_token', { path: '/admin' });

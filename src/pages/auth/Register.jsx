@@ -31,7 +31,7 @@ export default function Register() {
     setError('');
     setSuccess('');
     try {
-      const res = await fetch('http://localhost:8080/api/v1/userDetail/register', {
+      const res = await fetch('https://sparlex.up.railway.app/api/v1/userDetail/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

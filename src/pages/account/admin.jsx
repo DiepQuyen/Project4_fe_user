@@ -19,9 +19,9 @@ import {
 import MainCard from 'components/MainCard';
 import { toast } from 'react-toastify';
 
-const API_URL = 'http://localhost:8080/api/v1/admin/accounts';
-const ROLE_URL = 'http://localhost:8080/api/v1/roles';
-const BRANCH_URL = 'http://localhost:8080/api/v1/branch';
+const API_URL = 'https://sparlex.up.railway.app/api/v1/admin/accounts';
+const ROLE_URL = 'https://sparlex.up.railway.app/api/v1/roles';
+const BRANCH_URL = 'https://sparlex.up.railway.app/api/v1/branch';
 
 const AdminAccount = () => {
   const [users, setUsers] = useState([]);

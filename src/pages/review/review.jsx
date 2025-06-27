@@ -10,7 +10,7 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useAppointmentFilter } from 'contexts/AppointmentFilterContext';
 
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+const API_BASE_URL = 'https://sparlex.up.railway.app/api/v1';
 
 // Style cho Modal
 const modalStyle = {

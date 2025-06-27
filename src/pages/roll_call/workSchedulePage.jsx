@@ -19,7 +19,7 @@ import { toast } from 'react-toastify';
 import { useSearchParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
 
-const API_BASE_URL = 'http://localhost:8080/api/v1/users-schedules';
+const API_BASE_URL = 'https://sparlex.up.railway.app/api/v1/users-schedules';
 
 const WorkSchedulePage = () => {
   const [searchParams] = useSearchParams();

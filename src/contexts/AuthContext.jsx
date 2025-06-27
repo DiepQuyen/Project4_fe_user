@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:8080/api/v1/userDetail/me', {
+      const response = await fetch('https://sparlex.up.railway.app/api/v1/userDetail/me', {
         headers: {
           Authorization: `Bearer ${token}`
         }

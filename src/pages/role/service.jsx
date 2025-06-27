@@ -30,7 +30,7 @@ import {
 } from '@ant-design/icons';
 import { toast } from 'react-toastify';
 
-const API_URL = 'http://localhost:8080/api/v1/roles';
+const API_URL = 'https://sparlex.up.railway.app/api/v1/roles';
 
 const RoleManager = () => {
   // States

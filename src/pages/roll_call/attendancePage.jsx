@@ -21,7 +21,7 @@ const AttendancePage = () => {
           throw new Error('Người dùng chưa đăng nhập hoặc không tìm thấy thông tin.');
         }
 
-        const response = await fetch(`http://localhost:8080/api/v1/users-schedules/user/${userId}/schedule`, {
+        const response = await fetch(`https://sparlex.up.railway.app/api/v1/users-schedules/user/${userId}/schedule`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -65,7 +65,7 @@ const AttendancePage = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8080/api/v1/users-schedules/check-in/${todaysSchedule.id}`, {
+      const response = await fetch(`https://sparlex.up.railway.app/api/v1/users-schedules/check-in/${todaysSchedule.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -99,7 +99,7 @@ const AttendancePage = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8080/api/v1/users-schedules/check-out/${todaysSchedule.id}`, {
+      const response = await fetch(`https://sparlex.up.railway.app/api/v1/users-schedules/check-out/${todaysSchedule.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
