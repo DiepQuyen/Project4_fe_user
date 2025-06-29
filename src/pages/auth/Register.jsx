@@ -31,7 +31,7 @@ export default function Register() {
     setError('');
     setSuccess('');
     try {
-      const res = await fetch('https://sparlex.up.railway.app/api/v1/userDetail/register', {
+      const res = await fetch('https://sparlex-spa.up.railway.app/api/v1/userDetail/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -41,7 +41,7 @@ export default function Register() {
           phone,
           address,
           branchId: branchId ? Number(branchId) : null
-        }),
+        })
       });
       const data = await res.json();
       if (data.status === 'SUCCESS') {
@@ -53,7 +53,7 @@ export default function Register() {
           if (roleName === 'ROLE_ADMIN') {
             Cookies.set('admin_token', token, { path: '/admin', sameSite: 'Strict', expires: 7 });
             Cookies.set('admin_role', roleName, { path: '/admin', sameSite: 'Strict', expires: 7 });
-            window.location.href = 'https://project4-fe-admin-neon.vercel.app/admin';
+            window.location.href = 'https://project4-fe-admin-neon.vercel.app';
           } else if (roleName === 'ROLE_STAFF') {
             Cookies.set('staff_token', token, { path: '/staff', sameSite: 'Strict', expires: 7 });
             Cookies.set('staff_role', roleName, { path: '/staff', sameSite: 'Strict', expires: 7 });
@@ -101,44 +101,12 @@ export default function Register() {
             <Stack spacing={2}>
               {error && <Alert severity="error">{error}</Alert>}
               {success && <Alert severity="success">{success}</Alert>}
-              <TextField
-                label="Họ tên"
-                value={fullName}
-                onChange={e => setFullName(e.target.value)}
-                required
-              />
-              <TextField
-                label="Email"
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-              />
-              <TextField
-                label="Mật khẩu"
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-              />
-              <TextField
-                label="Số điện thoại"
-                value={phone}
-                onChange={e => setPhone(e.target.value)}
-                required
-              />
-              <TextField
-                label="Địa chỉ"
-                value={address}
-                onChange={e => setAddress(e.target.value)}
-                required
-              />
-              <TextField
-                label="Mã chi nhánh"
-                value={branchId}
-                onChange={e => setBranchId(e.target.value)}
-                required
-              />
+              <TextField label="Họ tên" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+              <TextField label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <TextField label="Mật khẩu" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <TextField label="Số điện thoại" value={phone} onChange={(e) => setPhone(e.target.value)} required />
+              <TextField label="Địa chỉ" value={address} onChange={(e) => setAddress(e.target.value)} required />
+              <TextField label="Mã chi nhánh" value={branchId} onChange={(e) => setBranchId(e.target.value)} required />
               <Button type="submit" variant="contained" color="primary">
                 Đăng ký
               </Button>

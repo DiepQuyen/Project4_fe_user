@@ -1,15 +1,38 @@
 import { useState, useEffect } from 'react';
 import {
-  Grid, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
-  Dialog, DialogTitle, DialogContent, DialogActions, TextField, Select, FormControl,
-  InputLabel, IconButton, TablePagination, Box, InputAdornment, Chip, MenuItem,
-  Typography, Divider, Avatar, Tooltip
+  Grid,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Select,
+  FormControl,
+  InputLabel,
+  IconButton,
+  TablePagination,
+  Box,
+  InputAdornment,
+  Chip,
+  MenuItem,
+  Typography,
+  Divider,
+  Avatar,
+  Tooltip
 } from '@mui/material';
 import {
   SearchOutlined,
   CloseOutlined,
   EyeOutlined,
-  EditOutlined, 
+  EditOutlined,
   CalendarOutlined,
   UserOutlined,
   CheckOutlined,
@@ -24,16 +47,16 @@ import MainCard from 'components/MainCard';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Cookies from 'js-cookie';
-import { useAppointmentFilter } from 'contexts/AppointmentFilterContext';
+import { useAppointmentFilter } from '../../contexts/AppointmentFilterContext';
 
-const API_URL = 'https://sparlex.up.railway.app/api/v1/admin/appointment';
-const API_STAFF_URL = 'https://sparlex.up.railway.app/api/v1/admin/accounts/find-all';
-const API_SERVICE_URL = 'https://sparlex.up.railway.app/api/v1/services/findAll';
-const EMAIL_API_URL = 'https://sparlex.up.railway.app/api/v1/email/send-appointment-confirmation';
+const API_URL = 'https://sparlex-spa.up.railway.app/api/v1/admin/appointment';
+const API_STAFF_URL = 'https://sparlex-spa.up.railway.app/api/v1/admin/accounts/find-all';
+const API_SERVICE_URL = 'https://sparlex-spa.up.railway.app/api/v1/services/findAll';
+const EMAIL_API_URL = 'https://sparlex-spa.up.railway.app/api/v1/email/send-appointment-confirmation';
 
 const AppointmentManagement = () => {
-  // States
   const { filter, setFilter } = useAppointmentFilter();
+  // States
   const [appointments, setAppointments] = useState([]);
   const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [userRole, setUserRole] = useState('');
@@ -46,14 +69,18 @@ const AppointmentManagement = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [serviceFilter, setServiceFilter] = useState('all');
-  const [staffFilter, setStaffFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState({
     startDate: '',
     endDate: ''
   });
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // Áp dụng filter từ Context khi nó thay đổi
+  // Đọc filter từ URL params khi component được tải
+  useEffect(() => {
+    // This effect can be used for future URL param handling
+  }, []); // Chỉ chạy một lần khi component mount
+
+  // Apply filter from context passed from dashboard
   useEffect(() => {
     if (filter) {
       if (filter.status) {
@@ -62,19 +89,11 @@ const AppointmentManagement = () => {
       if (filter.dateFilter) {
         setDateFilter(filter.dateFilter);
       }
-      if (filter.serviceId) {
-        setServiceFilter(filter.serviceId);
-      }
-      if (filter.staffId) {
-        setStaffFilter(filter.staffId);
-      }
-      // Xóa filter trong context sau khi đã áp dụng để không bị lọc lại ở lần sau
+      // Reset the filter in context after applying it
       setFilter(null);
     }
   }, [filter, setFilter]);
 
-  const [staffList, setStaffList] = useState([]);
-  const [serviceList, setServiceList] = useState([]);
   const [editDetailDialogOpen, setEditDetailDialogOpen] = useState(false);
   const [appointmentToEditDetails, setAppointmentToEditDetails] = useState(null);
   const [selectedStaffId, setSelectedStaffId] = useState(null);
@@ -97,7 +116,7 @@ const AppointmentManagement = () => {
   // Hàm gửi email xác nhận appointment
   const handleSendConfirmationEmail = async () => {
     if (!appointmentToSendEmail) return;
-    
+
     setEmailSending(true);
 
     try {
@@ -118,7 +137,7 @@ const AppointmentManagement = () => {
       const response = await fetch(EMAIL_API_URL, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(emailPayload)
       });
@@ -139,27 +158,6 @@ const AppointmentManagement = () => {
     }
   };
 
-  const fetchFilterData = async () => {
-    const token = Cookies.get('staff_token');
-    try {
-      // Fetch staff
-      const staffRes = await fetch(API_STAFF_URL, { headers: { Authorization: `Bearer ${token}` } });
-      const staffData = await staffRes.json();
-      if (staffData.status === 'SUCCESS') setStaffList(staffData.data);
-
-      // Fetch services
-      const serviceRes = await fetch(API_SERVICE_URL, { headers: { Authorization: `Bearer ${token}` } });
-      const serviceData = await serviceRes.json();
-      if (serviceData.status === 'SUCCESS') setServiceList(serviceData.data);
-    } catch (error) {
-      toast.error("Lỗi khi tải dữ liệu cho bộ lọc.");
-    }
-  };
-
-  useEffect(() => {
-    fetchFilterData();
-  }, []);
-
   const fetchAppointments = async (silent = false) => {
     const token = Cookies.get('staff_token');
     const role = Cookies.get('staff_role');
@@ -174,7 +172,6 @@ const AppointmentManagement = () => {
     }
 
     if (!token || (role !== 'ROLE_STAFF' && role !== 'ROLE_MANAGE')) {
-      console.error('Người dùng chưa đăng nhập hoặc không có quyền truy cập');
       if (!silent) toast.error('Vui lòng đăng nhập lại.');
       return;
     }
@@ -183,8 +180,8 @@ const AppointmentManagement = () => {
     try {
       const response = await fetch(url, {
         headers: {
-          Authorization: `Bearer ${token}`,
-        },
+          Authorization: `Bearer ${token}`
+        }
       });
 
       if (response.status === 401) {
@@ -192,11 +189,10 @@ const AppointmentManagement = () => {
       }
 
       const data = await response.json();
-      console.log('🔍 Raw API Data:', data.data); // Debug log
       if (data.status === 'SUCCESS' && Array.isArray(data.data)) {
         let mappedAppointments;
         if (role === 'ROLE_MANAGE') {
-          mappedAppointments = data.data.map(item => ({
+          mappedAppointments = data.data.map((item) => ({
             appointment_id: item.id,
             full_name: item.fullName,
             phone_number: item.phoneNumber,
@@ -222,10 +218,10 @@ const AppointmentManagement = () => {
               email: item.customerEmail || item.email || item.userEmail || ''
             },
             user: { id: item.userId, name: item.userName, image: item.userImageUrl || '' },
-            created_at: item.appointmentDate,
+            created_at: item.appointmentDate
           }));
         } else {
-          mappedAppointments = data.data.map(item => ({
+          mappedAppointments = data.data.map((item) => ({
             appointment_id: item.id,
             full_name: item.fullName,
             phone_number: item.phoneNumber,
@@ -235,24 +231,27 @@ const AppointmentManagement = () => {
             appointment_date: item.appointmentDate,
             end_time: item.endTime,
             price: item.price,
-            service: { name: item.serviceName },
-            branch: { name: item.branchName },
+            service: {
+              id: item.serviceId,
+              name: item.serviceName,
+              duration: item.serviceDuration || 60
+            },
+            branch: {
+              id: item.branchId,
+              name: item.branchName
+            },
             customer: {
               name: item.customerName,
               image: item.customerImageUrl,
               email: item.customerEmail || item.email || item.userEmail || ''
             },
             user: {
+              id: item.userId,
               name: item.userName,
-              image: item.userImageUrl,
-            },
+              image: item.userImageUrl
+            }
           }));
         }
-        console.log('📧 Mapped Appointments with emails:', mappedAppointments.map(a => ({ 
-          id: a.appointment_id, 
-          customerName: a.customer.name, 
-          customerEmail: a.customer.email 
-        }))); // Debug log
         setAppointments(mappedAppointments);
         setFilteredAppointments(mappedAppointments);
       } else {
@@ -269,8 +268,8 @@ const AppointmentManagement = () => {
   // Auto refresh appointments every 30 seconds to get real-time updates
   useEffect(() => {
     fetchAppointments();
-    
-    // Set up auto refresh interval for silent updates  
+
+    // Set up auto refresh interval for silent updates
     const interval = setInterval(() => {
       fetchAppointments(true); // Silent refresh to avoid loading indicators
     }, 30000); // Refresh every 30 seconds
@@ -285,15 +284,7 @@ const AppointmentManagement = () => {
     let results = [...appointments];
 
     if (statusFilter !== 'all') {
-      results = results.filter(appointment => appointment.status === statusFilter);
-    }
-
-    if (serviceFilter !== 'all') {
-        results = results.filter(appointment => appointment.service?.id === serviceFilter);
-    }
-
-    if (staffFilter !== 'all') {
-        results = results.filter(appointment => appointment.user?.id === staffFilter);
+      results = results.filter((appointment) => appointment.status === statusFilter);
     }
 
     // Apply date range filter
@@ -302,7 +293,7 @@ const AppointmentManagement = () => {
       const end = new Date(dateFilter.endDate);
       end.setHours(23, 59, 59); // Include the entire end day
 
-      results = results.filter(appointment => {
+      results = results.filter((appointment) => {
         const appointmentDate = new Date(appointment.appointment_date);
         return appointmentDate >= start && appointmentDate <= end;
       });
@@ -312,7 +303,7 @@ const AppointmentManagement = () => {
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       results = results.filter(
-        appointment =>
+        (appointment) =>
           appointment.full_name.toLowerCase().includes(query) ||
           appointment.phone_number.includes(query) ||
           appointment.service?.name?.toLowerCase().includes(query)
@@ -320,13 +311,11 @@ const AppointmentManagement = () => {
     }
 
     // Sort by appointment date (newest first - reverse order)
-    results = results.sort((a, b) =>
-      new Date(b.appointment_date) - new Date(a.appointment_date)
-    );
+    results = results.sort((a, b) => new Date(b.appointment_date) - new Date(a.appointment_date));
 
     setFilteredAppointments(results);
     setPage(0);
-  }, [searchQuery, statusFilter, dateFilter, appointments, serviceFilter, staffFilter]);
+  }, [searchQuery, statusFilter, dateFilter, appointments]);
 
   // Handlers
   const handleChangePage = (event, newPage) => {
@@ -394,7 +383,7 @@ const AppointmentManagement = () => {
       status: newStatus,
       slot: currentAppointment.slot,
       notes: currentAppointment.notes,
-      appointmentDate: formattedDate,
+      appointmentDate: formattedDate
     };
 
     fetch(`${API_URL}/update?AiD=${currentAppointment.appointment_id}`, {
@@ -402,23 +391,15 @@ const AppointmentManagement = () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updatePayload)
     })
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         if (data.status === 'SUCCESS') {
           toast.success('Cập nhật trạng thái thành công');
-          setAppointments(prev =>
-            prev.map(a =>
-              a.appointment_id === currentAppointment.appointment_id
-                ? { ...a, status: newStatus }
-                : a
-            )
+          setAppointments((prev) =>
+            prev.map((a) => (a.appointment_id === currentAppointment.appointment_id ? { ...a, status: newStatus } : a))
           );
-          setFilteredAppointments(prev =>
-            prev.map(a =>
-              a.appointment_id === currentAppointment.appointment_id
-                ? { ...a, status: newStatus }
-                : a
-            )
+          setFilteredAppointments((prev) =>
+            prev.map((a) => (a.appointment_id === currentAppointment.appointment_id ? { ...a, status: newStatus } : a))
           );
         } else {
           toast.error('Cập nhật thất bại');
@@ -435,11 +416,9 @@ const AppointmentManagement = () => {
 
   const handleClearFilters = () => {
     setStatusFilter('all');
-    setServiceFilter('all');
-    setStaffFilter('all');
     setDateFilter({ startDate: '', endDate: '' });
     setSearchQuery('');
-    toast.info("Đã xóa tất cả bộ lọc.");
+    toast.info('Đã xóa tất cả bộ lọc.');
   };
 
   // Helper functions
@@ -507,10 +486,7 @@ const AppointmentManagement = () => {
   };
 
   // Get current page appointments
-  const currentAppointments = filteredAppointments.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
+  const currentAppointments = filteredAppointments.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   return (
     <MainCard title="Quản lý lịch hẹn">
@@ -574,26 +550,6 @@ const AppointmentManagement = () => {
             </Select>
           </FormControl>
 
-          <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel>Dịch vụ</InputLabel>
-            <Select value={serviceFilter} label="Dịch vụ" onChange={(e) => setServiceFilter(e.target.value)}>
-              <MenuItem value="all">Tất cả dịch vụ</MenuItem>
-              {serviceList.map(service => (
-                <MenuItem key={service.id} value={service.id}>{service.name}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel>Nhân viên</InputLabel>
-            <Select value={staffFilter} label="Nhân viên" onChange={(e) => setStaffFilter(e.target.value)}>
-              <MenuItem value="all">Tất cả nhân viên</MenuItem>
-              {staffList.map(staff => (
-                <MenuItem key={staff.id} value={staff.id}>{staff.fullName}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <TextField
@@ -652,7 +608,9 @@ const AppointmentManagement = () => {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={8} align="center">Đang tải...</TableCell>
+                    <TableCell colSpan={8} align="center">
+                      Đang tải...
+                    </TableCell>
                   </TableRow>
                 ) : currentAppointments.length > 0 ? (
                   currentAppointments.map((appointment) => {
@@ -663,11 +621,7 @@ const AppointmentManagement = () => {
                         <TableCell>#{appointment.appointment_id}</TableCell>
                         <TableCell>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Avatar
-                              src={appointment.customer?.image}
-                              alt={appointment.full_name}
-                              sx={{ width: 32, height: 32 }}
-                            >
+                            <Avatar src={appointment.customer?.image} alt={appointment.full_name} sx={{ width: 32, height: 32 }}>
                               {!appointment.customer?.image && <UserOutlined />}
                             </Avatar>
                             <Box>
@@ -685,7 +639,8 @@ const AppointmentManagement = () => {
                             {appointment.service?.name}
                           </Typography>
                           <Typography variant="caption" color="primary">
-                            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(appointment.price * 10000)} • {appointment.service?.duration} phút
+                            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(appointment.price)} •{' '}
+                            {appointment.service?.duration} phút
                           </Typography>
                         </TableCell>
                         <TableCell>
@@ -698,16 +653,10 @@ const AppointmentManagement = () => {
                         </TableCell>
                         <TableCell>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Avatar
-                              src={appointment.user?.image}
-                              alt={appointment.user?.name}
-                              sx={{ width: 32, height: 32 }}
-                            >
+                            <Avatar src={appointment.user?.image} alt={appointment.user?.name} sx={{ width: 32, height: 32 }}>
                               {!appointment.user?.image && <UserOutlined />}
                             </Avatar>
-                            <Typography variant="body2">
-                              {appointment.user?.name || 'Chưa phân công'}
-                            </Typography>
+                            <Typography variant="body2">{appointment.user?.name || 'Chưa phân công'}</Typography>
                           </Box>
                         </TableCell>
                         <TableCell>{appointment.branch?.name}</TableCell>
@@ -724,50 +673,46 @@ const AppointmentManagement = () => {
                             }}
                           />
                         </TableCell>
-                                                <TableCell>
+                        <TableCell>
                           <Tooltip title="Xem chi tiết">
-                            <IconButton
-                              onClick={() => handleViewOpen(appointment)}
-                              color="info"
-                              size="small"
-                            >
+                            <IconButton onClick={() => handleViewOpen(appointment)} color="info" size="small">
                               <EyeOutlined />
                             </IconButton>
                           </Tooltip>
 
                           {/* Hiện nút Update cho cả STAFF và MANAGE nếu chưa completed/cancelled */}
-                          {(userRole === 'ROLE_MANAGE' || userRole === 'ROLE_STAFF') && appointment.status !== 'completed' && appointment.status !== 'cancelled' && (
-                            <>
-                              <Tooltip title="Cập nhật trạng thái">
-                                <IconButton
-                                  onClick={() => handleStatusDialogOpen(appointment)}
-                                  color="primary"
-                                  size="small"
-                                >
-                                  <EditOutlined />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title={!appointment.customer?.email ? "Không có email khách hàng" : "Gửi email xác nhận"}>
-                                <span>
-                                  <IconButton 
-                                    onClick={() => handleOpenEmailConfirmation(appointment)} 
-                                    color="success" 
-                                    size="small"
-                                    disabled={!appointment.customer?.email}
-                                  >
-                                    <MailOutlined />
+                          {(userRole === 'ROLE_MANAGE' || userRole === 'ROLE_STAFF') &&
+                            appointment.status !== 'completed' &&
+                            appointment.status !== 'cancelled' && (
+                              <>
+                                <Tooltip title="Cập nhật trạng thái">
+                                  <IconButton onClick={() => handleStatusDialogOpen(appointment)} color="primary" size="small">
+                                    <EditOutlined />
                                   </IconButton>
-                                </span>
-                              </Tooltip>
-                            </>
-                          )}
+                                </Tooltip>
+                                <Tooltip title={!appointment.customer?.email ? 'Không có email khách hàng' : 'Gửi email xác nhận'}>
+                                  <span>
+                                    <IconButton
+                                      onClick={() => handleOpenEmailConfirmation(appointment)}
+                                      color="success"
+                                      size="small"
+                                      disabled={!appointment.customer?.email}
+                                    >
+                                      <MailOutlined />
+                                    </IconButton>
+                                  </span>
+                                </Tooltip>
+                              </>
+                            )}
                         </TableCell>
                       </TableRow>
                     );
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={8} align="center">No appointments found</TableCell>
+                    <TableCell colSpan={8} align="center">
+                      No appointments found
+                    </TableCell>
                   </TableRow>
                 )}
               </TableBody>
@@ -810,11 +755,7 @@ const AppointmentManagement = () => {
                     Customer Information
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                    <Avatar
-                      src={currentAppointment.customer?.image}
-                      alt={currentAppointment.full_name}
-                      sx={{ width: 64, height: 64 }}
-                    >
+                    <Avatar src={currentAppointment.customer?.image} alt={currentAppointment.full_name} sx={{ width: 64, height: 64 }}>
                       {!currentAppointment.customer?.image && <UserOutlined style={{ fontSize: 32 }} />}
                     </Avatar>
                     <Box>
@@ -837,23 +778,31 @@ const AppointmentManagement = () => {
                   </Typography>
                   <Grid container spacing={2}>
                     <Grid item xs={6}>
-                      <Typography variant="caption" color="textSecondary">Date</Typography>
+                      <Typography variant="caption" color="textSecondary">
+                        Date
+                      </Typography>
                       <Typography variant="body2" sx={{ fontWeight: 500 }}>
                         {formatDate(currentAppointment.appointment_date)}
                       </Typography>
                     </Grid>
                     <Grid item xs={6}>
-                      <Typography variant="caption" color="textSecondary">Time</Typography>
+                      <Typography variant="caption" color="textSecondary">
+                        Time
+                      </Typography>
                       <Typography variant="body2" sx={{ fontWeight: 500 }}>
                         {formatTime(currentAppointment.appointment_date)} - {formatTime(currentAppointment.end_time)}
                       </Typography>
                     </Grid>
                     <Grid item xs={6}>
-                      <Typography variant="caption" color="textSecondary">Branch</Typography>
+                      <Typography variant="caption" color="textSecondary">
+                        Branch
+                      </Typography>
                       <Typography variant="body2">{currentAppointment.branch.name}</Typography>
                     </Grid>
                     <Grid item xs={6}>
-                      <Typography variant="caption" color="textSecondary">Status</Typography>
+                      <Typography variant="caption" color="textSecondary">
+                        Status
+                      </Typography>
                       <Box sx={{ mt: 0.5 }}>
                         <Chip
                           icon={getStatusChipProps(currentAppointment.status).icon}
@@ -864,23 +813,21 @@ const AppointmentManagement = () => {
                       </Box>
                     </Grid>
                     <Grid item xs={12}>
-                      <Typography variant="caption" color="textSecondary">Staff Assigned</Typography>
+                      <Typography variant="caption" color="textSecondary">
+                        Staff Assigned
+                      </Typography>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                        <Avatar
-                          src={currentAppointment.user?.image}
-                          alt={currentAppointment.user?.name}
-                          sx={{ width: 24, height: 24 }}
-                        >
+                        <Avatar src={currentAppointment.user?.image} alt={currentAppointment.user?.name} sx={{ width: 24, height: 24 }}>
                           {!currentAppointment.user?.image && <UserOutlined style={{ fontSize: 14 }} />}
                         </Avatar>
-                        <Typography variant="body2">
-                          {currentAppointment.user?.name || 'Unassigned'}
-                        </Typography>
+                        <Typography variant="body2">{currentAppointment.user?.name || 'Unassigned'}</Typography>
                       </Box>
                     </Grid>
                     {currentAppointment.notes && (
                       <Grid item xs={12}>
-                        <Typography variant="caption" color="textSecondary">Notes</Typography>
+                        <Typography variant="caption" color="textSecondary">
+                          Notes
+                        </Typography>
                         <Typography variant="body2">{currentAppointment.notes}</Typography>
                       </Grid>
                     )}
@@ -900,14 +847,12 @@ const AppointmentManagement = () => {
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                       <Typography variant="body2">Price:</Typography>
                       <Typography variant="body2" color="primary" sx={{ fontWeight: 600 }}>
-                        ${currentAppointment.price.toFixed(2)}
+                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(currentAppointment.price)}
                       </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                       <Typography variant="body2">Duration:</Typography>
-                      <Typography variant="body2">
-                        {currentAppointment.service.duration} minutes
-                      </Typography>
+                      <Typography variant="body2">{currentAppointment.service.duration} minutes</Typography>
                     </Box>
                   </Paper>
                 </Box>
@@ -918,24 +863,23 @@ const AppointmentManagement = () => {
                   </Typography>
                   <Grid container spacing={2}>
                     <Grid item xs={6}>
-                      <Typography variant="caption" color="textSecondary">Booking ID</Typography>
+                      <Typography variant="caption" color="textSecondary">
+                        Booking ID
+                      </Typography>
                       <Typography variant="body2">#{currentAppointment.appointment_id}</Typography>
                     </Grid>
                     <Grid item xs={6}>
-                      <Typography variant="caption" color="textSecondary">Created On</Typography>
+                      <Typography variant="caption" color="textSecondary">
+                        Created On
+                      </Typography>
                       <Typography variant="body2">{formatDate(currentAppointment.created_at)}</Typography>
                     </Grid>
                     <Grid item xs={12}>
                       <Divider sx={{ my: 1 }} />
                       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-
                         {/* --- BỌC NÚT UPDATE TRONG ĐIỀU KIỆN CHO CẢ STAFF VÀ MANAGE --- */}
                         {(userRole === 'ROLE_MANAGE' || userRole === 'ROLE_STAFF') && (
-                          <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={() => handleStatusDialogOpen(currentAppointment)}
-                          >
+                          <Button variant="contained" color="primary" onClick={() => handleStatusDialogOpen(currentAppointment)}>
                             Update Status
                           </Button>
                         )}
@@ -951,9 +895,7 @@ const AppointmentManagement = () => {
 
       {/* Update Status Dialog */}
       <Dialog open={statusDialogOpen} onClose={handleStatusDialogClose} maxWidth="xs" fullWidth>
-        <DialogTitle>
-          Update Appointment Status
-        </DialogTitle>
+        <DialogTitle>Update Appointment Status</DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
             Change the status for appointment #{currentAppointment?.appointment_id}
@@ -969,45 +911,25 @@ const AppointmentManagement = () => {
             >
               <MenuItem value="pending">
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Chip
-                    size="small"
-                    label="Pending"
-                    color="warning"
-                    sx={{ minWidth: 80 }}
-                  />
+                  <Chip size="small" label="Pending" color="warning" sx={{ minWidth: 80 }} />
                   <Typography variant="body2">Waiting for confirmation</Typography>
                 </Box>
               </MenuItem>
               <MenuItem value="confirmed">
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Chip
-                    size="small"
-                    label="Confirmed"
-                    color="info"
-                    sx={{ minWidth: 80 }}
-                  />
+                  <Chip size="small" label="Confirmed" color="info" sx={{ minWidth: 80 }} />
                   <Typography variant="body2">Appointment is confirmed</Typography>
                 </Box>
               </MenuItem>
               <MenuItem value="completed">
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Chip
-                    size="small"
-                    label="Completed"
-                    color="success"
-                    sx={{ minWidth: 80 }}
-                  />
+                  <Chip size="small" label="Completed" color="success" sx={{ minWidth: 80 }} />
                   <Typography variant="body2">Service has been provided</Typography>
                 </Box>
               </MenuItem>
               <MenuItem value="cancelled">
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Chip
-                    size="small"
-                    label="Cancelled"
-                    color="error"
-                    sx={{ minWidth: 80 }}
-                  />
+                  <Chip size="small" label="Cancelled" color="error" sx={{ minWidth: 80 }} />
                   <Typography variant="body2">Appointment was cancelled</Typography>
                 </Box>
               </MenuItem>
@@ -1015,7 +937,9 @@ const AppointmentManagement = () => {
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleStatusDialogClose} color="inherit">Cancel</Button>
+          <Button onClick={handleStatusDialogClose} color="inherit">
+            Cancel
+          </Button>
           <Button onClick={handleStatusChange} variant="contained" color="primary">
             Update Status
           </Button>
@@ -1044,16 +968,20 @@ const AppointmentManagement = () => {
                   </Typography>
                 </Box>
               </Grid>
-              
+
               <Grid item xs={12} sm={6}>
-                <Typography variant="subtitle2" color="textSecondary">To:</Typography>
+                <Typography variant="subtitle2" color="textSecondary">
+                  To:
+                </Typography>
                 <Typography variant="body1" sx={{ fontWeight: 500 }}>
                   {appointmentToSendEmail.customer?.email || 'No email available'}
                 </Typography>
               </Grid>
-              
+
               <Grid item xs={12} sm={6}>
-                <Typography variant="subtitle2" color="textSecondary">Customer:</Typography>
+                <Typography variant="subtitle2" color="textSecondary">
+                  Customer:
+                </Typography>
                 <Typography variant="body1" sx={{ fontWeight: 500 }}>
                   {appointmentToSendEmail.full_name}
                 </Typography>
@@ -1061,48 +989,62 @@ const AppointmentManagement = () => {
 
               <Grid item xs={12}>
                 <Divider sx={{ my: 1 }} />
-                <Typography variant="h6" gutterBottom>Appointment Details</Typography>
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Typography variant="subtitle2" color="textSecondary">Service:</Typography>
-                <Typography variant="body1">{appointmentToSendEmail.service.name}</Typography>
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Typography variant="subtitle2" color="textSecondary">Price:</Typography>
-                <Typography variant="body1" color="primary" sx={{ fontWeight: 600 }}>
-                  ${appointmentToSendEmail.price?.toFixed(2)}
+                <Typography variant="h6" gutterBottom>
+                  Appointment Details
                 </Typography>
               </Grid>
 
               <Grid item xs={12} sm={6}>
-                <Typography variant="subtitle2" color="textSecondary">Date:</Typography>
+                <Typography variant="subtitle2" color="textSecondary">
+                  Service:
+                </Typography>
+                <Typography variant="body1">{appointmentToSendEmail.service.name}</Typography>
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="textSecondary">
+                  Price:
+                </Typography>
+                <Typography variant="body1" color="primary" sx={{ fontWeight: 600 }}>
+                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(appointmentToSendEmail.price || 0)}
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="textSecondary">
+                  Date:
+                </Typography>
                 <Typography variant="body1">{formatDate(appointmentToSendEmail.appointment_date)}</Typography>
               </Grid>
 
               <Grid item xs={12} sm={6}>
-                <Typography variant="subtitle2" color="textSecondary">Time:</Typography>
+                <Typography variant="subtitle2" color="textSecondary">
+                  Time:
+                </Typography>
                 <Typography variant="body1">
                   {formatTime(appointmentToSendEmail.appointment_date)} - {formatTime(appointmentToSendEmail.end_time)}
                 </Typography>
               </Grid>
 
               <Grid item xs={12} sm={6}>
-                <Typography variant="subtitle2" color="textSecondary">Staff:</Typography>
-                <Typography variant="body1">
-                  {appointmentToSendEmail.user?.name || 'Staff will be assigned'}
+                <Typography variant="subtitle2" color="textSecondary">
+                  Staff:
                 </Typography>
+                <Typography variant="body1">{appointmentToSendEmail.user?.name || 'Staff will be assigned'}</Typography>
               </Grid>
 
               <Grid item xs={12} sm={6}>
-                <Typography variant="subtitle2" color="textSecondary">Branch:</Typography>
+                <Typography variant="subtitle2" color="textSecondary">
+                  Branch:
+                </Typography>
                 <Typography variant="body1">{appointmentToSendEmail.branch.name}</Typography>
               </Grid>
 
               {appointmentToSendEmail.notes && (
                 <Grid item xs={12}>
-                  <Typography variant="subtitle2" color="textSecondary">Notes:</Typography>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    Notes:
+                  </Typography>
                   <Typography variant="body1">{appointmentToSendEmail.notes}</Typography>
                 </Grid>
               )}
@@ -1110,8 +1052,8 @@ const AppointmentManagement = () => {
               <Grid item xs={12}>
                 <Box sx={{ mt: 2, p: 2, backgroundColor: '#e3f2fd', borderRadius: 1 }}>
                   <Typography variant="body2" color="primary">
-                    📧 The customer will receive a professional email with all appointment details, 
-                    confirmation instructions, and contact information.
+                    📧 The customer will receive a professional email with all appointment details, confirmation instructions, and contact
+                    information.
                   </Typography>
                 </Box>
               </Grid>
@@ -1122,9 +1064,9 @@ const AppointmentManagement = () => {
           <Button onClick={handleCloseEmailConfirmation} color="inherit">
             Cancel
           </Button>
-          <Button 
-            onClick={handleSendConfirmationEmail} 
-            variant="contained" 
+          <Button
+            onClick={handleSendConfirmationEmail}
+            variant="contained"
             color="primary"
             disabled={emailSending || !appointmentToSendEmail?.customer?.email}
             startIcon={emailSending ? null : <MailOutlined />}

@@ -35,7 +35,7 @@ const AttendanceHistoryPage = () => {
           throw new Error('User ID không hợp lệ. Vui lòng đăng nhập lại.');
         }
 
-        const res = await fetch(`https://sparlex.up.railway.app/api/v1/admin/attendance/history?userId=${userId}`, {
+        const res = await fetch(`https://sparlex-spa.up.railway.app/api/v1/admin/attendance/history?userId=${userId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
